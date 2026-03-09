@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="BonGoo.Shared/BonGoo.Shared.csproj" />
+  <Project Path="BonGoo.Web.API/BonGoo.Web.API.csproj" />
+  <Project Path="BonGoo.Web.Setup/BonGoo.Web.Setup.csproj" />
+</Solution>
