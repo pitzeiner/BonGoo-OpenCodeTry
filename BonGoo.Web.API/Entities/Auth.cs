@@ -2,6 +2,7 @@ namespace BonGoo.Web.API.Entities;
 
 public class QrLoginToken : BaseEntity
 {
+    public string Token { get; set; } = string.Empty;
     public int Type { get; set; }
     
     public Guid? AbgabestelleId { get; set; }
@@ -12,6 +13,7 @@ public class QrLoginToken : BaseEntity
     
     public DateTime ExpiresAt { get; set; }
     public bool IsUsed { get; set; }
+    public DateTime? UsedAt { get; set; }
     public string? UsedByClientInfo { get; set; }
     public string? UsedByIpAddress { get; set; }
 }

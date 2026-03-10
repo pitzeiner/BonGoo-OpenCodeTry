@@ -1,6 +1,6 @@
 # PROJ-3: Events (Veranstalter & Veranstaltungen)
 
-## Status: ⏳ Offen
+## Status: ✅ Abgeschlossen
 
 ### Veranstalter
 

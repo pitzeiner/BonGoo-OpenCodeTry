@@ -1,6 +1,6 @@
 # PROJ-2: Auth-System
 
-## Status: ⏳ Offen
+## Status: ✅ Abgeschlossen
 
 ### Geplante Features
 

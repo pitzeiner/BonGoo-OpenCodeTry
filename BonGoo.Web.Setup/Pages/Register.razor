@@ -1,0 +1,99 @@
+@page "/register"
+@layout AuthLayout
+@using BonGoo.Web.Setup.Services
+
+<h5 class="mb-3 text-center">Registrieren</h5>
+
+<EditForm Model="@registerRequest" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    
+    <div class="mb-2">
+        <label class="form-label">Vorname</label>
+        <InputText @bind-Value="registerRequest.FirstName" class="form-control form-control-sm" />
+        <ValidationMessage For="() => registerRequest.FirstName" class="text-danger small" />
+    </div>
+    
+    <div class="mb-2">
+        <label class="form-label">Nachname</label>
+        <InputText @bind-Value="registerRequest.LastName" class="form-control form-control-sm" />
+        <ValidationMessage For="() => registerRequest.LastName" class="text-danger small" />
+    </div>
+    
+    <div class="mb-2">
+        <label class="form-label">E-Mail</label>
+        <InputText @bind-Value="registerRequest.Email" class="form-control form-control-sm" type="email" />
+        <ValidationMessage For="() => registerRequest.Email" class="text-danger small" />
+    </div>
+    
+    <div class="mb-2">
+        <label class="form-label">Passwort</label>
+        <InputText @bind-Value="registerRequest.Password" class="form-control form-control-sm" type="password" />
+        <ValidationMessage For="() => registerRequest.Password" class="text-danger small" />
+    </div>
+    
+    <div class="mb-3">
+        <label class="form-label">Telefon (optional)</label>
+        <InputText @bind-Value="registerRequest.Phone" class="form-control form-control-sm" type="tel" />
+    </div>
+    
+    @if (!string.IsNullOrEmpty(message))
+    {
+        <div class="alert @(isSuccess ? "alert-success" : "alert-danger") py-2 small">@message</div>
+    }
+    
+    <button type="submit" class="btn btn-secondary w-100 btn-sm" disabled="@isLoading">
+        @if (isLoading)
+        {
+            <span class="spinner-border spinner-border-sm me-1"></span>
+        }
+        Registrieren
+    </button>
+</EditForm>
+
+<div class="mt-3 text-center">
+    <small class="text-muted">
+        Bereits registriert? <a href="/login" class="text-decoration-none">Anmelden</a>
+    </small>
+</div>
+
+@code {
+    private RegisterRequest registerRequest = new();
+    private bool isLoading;
+    private string message = string.Empty;
+    private bool isSuccess;
+
+    [Inject] private IAuthService AuthService { get; set; } = null!;
+    [Inject] private NavigationManager Navigation { get; set; } = null!;
+
+    private async Task HandleRegister()
+    {
+        isLoading = true;
+        message = string.Empty;
+
+        try
+        {
+            var result = await AuthService.RegisterAsync(registerRequest);
+            if (result is not null)
+            {
+                isSuccess = true;
+                message = result.Message;
+                await Task.Delay(1500);
+                Navigation.NavigateTo("/login");
+            }
+            else
+            {
+                isSuccess = false;
+                message = "Registrierung fehlgeschlagen";
+            }
+        }
+        catch (Exception)
+        {
+            isSuccess = false;
+            message = "Ein Fehler ist aufgetreten";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

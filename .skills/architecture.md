@@ -13,18 +13,77 @@ Führende Richtlinien für Architekturentscheidungen im BonGoo-Projekt.
 
 ### Vertical Slice Architecture
 
-Jede Feature-Slice ist in einer einzigen Klasse implementiert:
+Jede Feature-Slice ist eine **static class** mit **nested subclasses** für alle Komponenten:
 
 ```
 Features/
-└── Veranstaltungen/
-    └── GetAllEndpoint.cs  # Endpoint + Request/Response + Handler
+└── Auth/
+    ├── RegisterEndpoint.cs    # Static class mit Request, Response, Endpoint
+    ├── LoginEndpoint.cs
+    ├── RefreshTokenEndpoint.cs
+    └── ...
 ```
 
-Alle zugehörigen Komponenten bleiben zusammen:
-- Endpoint-Definition
-- Request/Response DTOs
-- Geschäftslogik (Handler)
+**Pattern: Eine static class pro Use-Case**
+
+```csharp
+public static class RegisterEndpoint  // Use-Case als static class
+{
+    // Request DTO
+    public class Request
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    // Response DTO
+    public class Response
+    {
+        public Guid UserId { get; set; }
+        public string Email { get; set; } = string.Empty;
+    }
+
+    // Endpoint-Logik
+    public class Endpoint : Endpoint<Request, Response>
+    {
+        public override void Configure()
+        {
+            Post("/api/auth/register");
+            AllowAnonymous();
+        }
+
+        public override async Task HandleAsync(Request req, CancellationToken ct)
+        {
+            // Business Logic
+        }
+    }
+
+    // Optional: Validator (wenn nicht auto-validation)
+    public class Validator : Validator<Request>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Email).EmailAddress();
+            RuleFor(x => x.Password).MinimumLength(8);
+        }
+    }
+
+    // Optional: Service-Klasse für komplexe Business Logic
+    public class Service
+    {
+        public async Task<User> CreateUserAsync(Request req)
+        {
+            // ...
+        }
+    }
+}
+```
+
+**Wichtige Regeln:**
+- Alles in einer Datei (static class mit nested classes)
+- Keine separaten Dateien für Request/Response/Validator
+- Business Logic direkt in Endpoint oder in nested Service-Klasse
+- Request/Response müssen不同的 Namen haben als `Endpoint<Response>` (Konflikt!)
 
 ### DTOs in Shared Library
 
@@ -110,3 +169,22 @@ dotnet ef database update
 - `appsettings.json` für Development
 - `appsettings.Production.json` für Produktion
 - Environment-Variablen für Secrets
+
+## Git Workflow
+
+### Ein Projekt = Ein Branch
+
+Für jedes Projekt/Feature einen eigenen Branch erstellen:
+
+```bash
+# Neuen Branch für Projekt erstellen
+git checkout -b PROJ-2-Auth
+
+# Oder für Feature-Branches
+git checkout -b feature/veranstalter-crud
+```
+
+**Wichtige Regeln:**
+- NIEMALS direkt auf `main` entwickeln
+- Erst testen, dann in `main` mergen
+- Bei mehreren Sessions: jeder auf eigenem Branch arbeiten
