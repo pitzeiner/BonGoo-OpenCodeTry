@@ -3,20 +3,17 @@ using System;
 using BonGoo.Web.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace BonGoo.Web.API.Data.Migrations
+namespace BonGoo.Web.API.Migrations
 {
     [DbContext(typeof(BonGooDbContext))]
-    [Migration("20260309173734_InitialCreate")]
-    partial class InitialCreate
+    partial class BonGooDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -176,7 +173,7 @@ namespace BonGoo.Web.API.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Anmerkung")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("BestellungId")
                         .HasColumnType("uuid");
@@ -673,7 +670,7 @@ namespace BonGoo.Web.API.Data.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Beschreibung")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Bezeichnung")
                         .IsRequired()
@@ -684,7 +681,7 @@ namespace BonGoo.Web.API.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<byte[]>("Logo")
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("bytea");
 
                     b.Property<string>("Ort")
                         .HasMaxLength(100)
@@ -721,7 +718,7 @@ namespace BonGoo.Web.API.Data.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Beschreibung")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Bezeichnung")
                         .IsRequired()

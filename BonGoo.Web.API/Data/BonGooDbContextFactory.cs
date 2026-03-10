@@ -8,7 +8,11 @@ public class BonGooDbContextFactory : IDesignTimeDbContextFactory<BonGooDbContex
     public BonGooDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<BonGooDbContext>();
-        optionsBuilder.UseNpgsql("Host=localhost;Database=BonGoo;Username=postgres;Password=placeholder");
+        
+        var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
+            ?? throw new InvalidOperationException("Connection string not found. Set ConnectionStrings__DefaultConnection environment variable.");
+        
+        optionsBuilder.UseNpgsql(connectionString);
         
         return new BonGooDbContext(optionsBuilder.Options);
     }

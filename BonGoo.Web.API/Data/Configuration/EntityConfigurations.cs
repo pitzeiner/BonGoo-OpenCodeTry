@@ -16,8 +16,7 @@ public class VeranstaltungConfiguration : IEntityTypeConfiguration<Veranstaltung
             .IsRequired()
             .HasMaxLength(100);
         
-        builder.Property(x => x.Beschreibung)
-            .HasColumnType("nvarchar(max)");
+        builder.Property(x => x.Beschreibung);
         
         builder.Property(x => x.Von)
             .IsRequired();
@@ -156,8 +155,7 @@ public class BonConfiguration : IEntityTypeConfiguration<Bon>
         
         builder.HasKey(x => x.Id);
         
-        builder.Property(x => x.Anmerkung)
-            .HasColumnType("nvarchar(max)");
+        builder.Property(x => x.Anmerkung);
         
         builder.HasOne(x => x.Bestellung)
             .WithMany(x => x.Bons)

@@ -16,11 +16,9 @@ public class VeranstalterConfiguration : IEntityTypeConfiguration<Veranstalter>
             .IsRequired()
             .HasMaxLength(100);
         
-        builder.Property(x => x.Beschreibung)
-            .HasColumnType("nvarchar(max)");
+        builder.Property(x => x.Beschreibung);
         
-        builder.Property(x => x.Logo)
-            .HasColumnType("varbinary(max)");
+        builder.Property(x => x.Logo);
         
         builder.Property(x => x.Plz)
             .HasMaxLength(20);

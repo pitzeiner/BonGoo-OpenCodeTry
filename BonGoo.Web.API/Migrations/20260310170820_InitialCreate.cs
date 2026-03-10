@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace BonGoo.Web.API.Data.Migrations
+namespace BonGoo.Web.API.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -202,7 +202,7 @@ namespace BonGoo.Web.API.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Anmerkung = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Anmerkung = table.Column<string>(type: "text", nullable: true),
                     Abgerechnet = table.Column<bool>(type: "boolean", nullable: false),
                     Fremdverpflegung = table.Column<bool>(type: "boolean", nullable: false),
                     Eigenverbrauch = table.Column<bool>(type: "boolean", nullable: false),
@@ -372,8 +372,8 @@ namespace BonGoo.Web.API.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Bezeichnung = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Beschreibung = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Logo = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    Beschreibung = table.Column<string>(type: "text", nullable: true),
+                    Logo = table.Column<byte[]>(type: "bytea", nullable: true),
                     Plz = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
                     Ort = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     Strasse = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
@@ -398,7 +398,7 @@ namespace BonGoo.Web.API.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Bezeichnung = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Beschreibung = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Beschreibung = table.Column<string>(type: "text", nullable: true),
                     Von = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Bis = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     Aktiv = table.Column<bool>(type: "boolean", nullable: false),
