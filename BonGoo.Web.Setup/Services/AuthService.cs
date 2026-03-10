@@ -13,21 +13,21 @@ public interface IAuthService
     Task<RefreshTokenResponse?> RefreshTokenAsync(string refreshToken);
     Task LogoutAsync();
     Task<bool> IsAuthenticatedAsync();
-    string? GetAccessToken();
-    string? GetRefreshToken();
+    Task<string?> GetAccessTokenAsync();
+    Task<string?> GetRefreshTokenAsync();
 }
 
 public class AuthService : IAuthService
 {
     private readonly HttpClient _http;
-    private readonly AuthenticationStateProvider _authStateProvider;
+    private readonly IServiceProvider _serviceProvider;
     private const string AccessTokenKey = "access_token";
     private const string RefreshTokenKey = "refresh_token";
 
-    public AuthService(HttpClient http, AuthenticationStateProvider authStateProvider)
+    public AuthService(HttpClient http, IServiceProvider serviceProvider)
     {
         _http = http;
-        _authStateProvider = authStateProvider;
+        _serviceProvider = serviceProvider;
     }
 
     public async Task<LoginResponse?> LoginAsync(LoginRequest request)
@@ -40,7 +40,7 @@ public class AuthService : IAuthService
         if (result is not null)
         {
             await StoreTokensAsync(result.AccessToken, result.RefreshToken);
-            await (_authStateProvider as AuthStateProvider)!.NotifyAuthStateChanged();
+            NotifyAuthenticationStateChanged();
         }
         return result;
     }
@@ -64,7 +64,7 @@ public class AuthService : IAuthService
         if (result is not null)
         {
             await StoreTokensAsync(result.AccessToken, result.RefreshToken);
-            await (_authStateProvider as AuthStateProvider)!.NotifyAuthStateChanged();
+            NotifyAuthenticationStateChanged();
         }
         return result;
     }
@@ -73,33 +73,42 @@ public class AuthService : IAuthService
     {
         await _http.PostAsync("api/auth/logout", null);
         await ClearTokensAsync();
-        await (_authStateProvider as AuthStateProvider)!.NotifyAuthStateChanged();
+        NotifyAuthenticationStateChanged();
+    }
+
+    private void NotifyAuthenticationStateChanged()
+    {
+        var authState = _serviceProvider.GetService<AuthenticationStateProvider>() as AuthStateProvider;
+        authState?.NotifyAuthStateChanged();
     }
 
     public Task<bool> IsAuthenticatedAsync()
+        => IsAuthenticatedInternalAsync();
+
+    public Task<string?> GetAccessTokenAsync()
+        => BrowserStorage.GetItemAsync(AccessTokenKey);
+
+    public Task<string?> GetRefreshTokenAsync()
+        => BrowserStorage.GetItemAsync(RefreshTokenKey);
+
+    private async Task<bool> IsAuthenticatedInternalAsync()
     {
-        var token = GetAccessToken();
-        return Task.FromResult(!string.IsNullOrEmpty(token));
+        var token = await GetAccessTokenAsync();
+        return !string.IsNullOrEmpty(token);
     }
-
-    public string? GetAccessToken() => 
-        BrowserStorage.GetItem(AccessTokenKey);
-
-    public string? GetRefreshToken() => 
-        BrowserStorage.GetItem(RefreshTokenKey);
 
     private async Task StoreTokensAsync(string accessToken, string refreshToken)
     {
-        BrowserStorage.SetItem(AccessTokenKey, accessToken);
-        BrowserStorage.SetItem(RefreshTokenKey, refreshToken);
+        await BrowserStorage.SetItemAsync(AccessTokenKey, accessToken);
+        await BrowserStorage.SetItemAsync(RefreshTokenKey, refreshToken);
         _http.DefaultRequestHeaders.Authorization = 
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
     }
 
     private async Task ClearTokensAsync()
     {
-        BrowserStorage.RemoveItem(AccessTokenKey);
-        BrowserStorage.RemoveItem(RefreshTokenKey);
+        await BrowserStorage.RemoveItemAsync(AccessTokenKey);
+        await BrowserStorage.RemoveItemAsync(RefreshTokenKey);
         _http.DefaultRequestHeaders.Authorization = null;
     }
 }
@@ -115,7 +124,7 @@ public class AuthStateProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var token = _authService.GetAccessToken();
+        var token = await _authService.GetAccessTokenAsync();
         if (string.IsNullOrEmpty(token))
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
@@ -139,12 +148,11 @@ public static class BrowserStorage
 
     public static void Initialize(IJSRuntime js) => _js = js;
 
-    public static string? GetItem(string key)
+    public static async Task<string?> GetItemAsync(string key)
     {
         try
         {
-            var task = _js!.InvokeAsync<string>("localStorage.getItem", key);
-            return task.IsCompleted ? task.Result : null;
+            return await _js!.InvokeAsync<string?>("localStorage.getItem", key);
         }
         catch
         {
@@ -152,13 +160,13 @@ public static class BrowserStorage
         }
     }
 
-    public static void SetItem(string key, string value)
+    public static Task SetItemAsync(string key, string value)
     {
-        _js?.InvokeVoidAsync("localStorage.setItem", key, value);
+        return _js?.InvokeVoidAsync("localStorage.setItem", key, value).AsTask() ?? Task.CompletedTask;
     }
 
-    public static void RemoveItem(string key)
+    public static Task RemoveItemAsync(string key)
     {
-        _js?.InvokeVoidAsync("localStorage.removeItem", key);
+        return _js?.InvokeVoidAsync("localStorage.removeItem", key).AsTask() ?? Task.CompletedTask;
     }
 }

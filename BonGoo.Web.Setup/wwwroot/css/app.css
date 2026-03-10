@@ -1,5 +1,21 @@
+:root {
+    --bon-primary: #4a6fa5;
+    --bon-secondary: #6c757d;
+    --bon-bg: #f3f5f7;
+    --bon-surface: #ffffff;
+    --bon-border: #dfe4ea;
+    --bon-text: #2f3a45;
+    --bon-sidebar-bg-top: #e9eef3;
+    --bon-sidebar-bg-bottom: #dde5ec;
+    --bon-sidebar-text: #324252;
+    --bon-sidebar-hover: #ccd8e3;
+    --bon-sidebar-active: #b8c8d8;
+}
+
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bon-bg);
+    color: var(--bon-text);
 }
 
 h1:focus {
@@ -7,7 +23,7 @@ h1:focus {
 }
 
 a, .btn-link {
-    color: #0071c1;
+    color: var(--bon-primary);
 }
 
 .btn-primary {
